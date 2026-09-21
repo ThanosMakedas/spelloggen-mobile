@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
 import { hamtaAllaSpel } from '../api'
 
-export default function ListaSkarm() {
+// navigation is given to every screen in the stack. It is what opens another screen.
+export default function ListaSkarm({ navigation }) {
   const [spel, setSpel] = useState([])
   const [laddar, setLaddar] = useState(true)
 
@@ -28,13 +29,16 @@ export default function ListaSkarm() {
       keyExtractor={(item) => String(item.id)}
       contentContainerStyle={styles.innehall}
       renderItem={({ item }) => (
-        <View style={styles.kort}>
+        <Pressable
+          style={styles.kort}
+          onPress={() => navigation.navigate('Detaljer', { id: item.id, titel: item.titel })}
+        >
           <Text style={styles.titel}>{item.titel}</Text>
           <Text style={styles.text}>
             {item.plattform} - {item.status}
           </Text>
           <Text style={styles.text}>{item.speladeTimmar} timmar</Text>
-        </View>
+        </Pressable>
       )}
     />
   )

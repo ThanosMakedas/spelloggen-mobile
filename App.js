@@ -1,6 +1,7 @@
 import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { StatusBar } from 'expo-status-bar'
+import DetaljSkarm from './screens/DetaljSkarm'
 import ListaSkarm from './screens/ListaSkarm'
 
 // A stack works like a pile of paper: the list is at the bottom, and other
@@ -18,6 +19,13 @@ export default function App() {
         }}
       >
         <Stack.Screen name="Lista" component={ListaSkarm} options={{ title: 'Spelloggen' }} />
+
+        {/* The title of this screen is the name of the game that was tapped. */}
+        <Stack.Screen
+          name="Detaljer"
+          component={DetaljSkarm}
+          options={({ route }) => ({ title: route.params.titel })}
+        />
       </Stack.Navigator>
 
       <StatusBar style="light" />
