@@ -12,7 +12,6 @@ export default function ListaSkarm({ navigation }) {
   const [fel, setFel] = useState(null)
 
   function hamta() {
-    setLaddar(true)
     setFel(null)
 
     hamtaAllaSpel()
@@ -21,10 +20,13 @@ export default function ListaSkarm({ navigation }) {
       .finally(() => setLaddar(false))
   }
 
-  // Runs once, when the screen is shown the first time.
   useEffect(() => {
     hamta()
-  }, [])
+
+    // Load the list again every time this screen comes back into focus,
+    // so a game that was edited shows its new values.
+    return navigation.addListener('focus', hamta)
+  }, [navigation])
 
   if (laddar) {
     return (
