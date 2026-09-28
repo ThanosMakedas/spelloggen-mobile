@@ -15,7 +15,23 @@ if (Platform.OS === 'android' && (dator === 'localhost' || dator === '127.0.0.1'
 
 export const API_URL = `http://${dator}:5080`
 
-// Both calls below go through this one, so the error messages are the same everywhere.
+const INTE_NADD = `Kunde inte nå API:et på ${API_URL}. Är det startat?`
+
+// Turns an answer the API is not happy with into one readable sentence.
+async function lasFel(svar) {
+  const text = await svar.text()
+
+  try {
+    // A validation error looks like { errors: { Titel: ["Titel måste fyllas i."] } }.
+    const problem = JSON.parse(text)
+    if (problem.errors) return Object.values(problem.errors).flat().join(' ')
+  } catch {
+    if (text) return text
+  }
+
+  return `API:et svarade med fel ${svar.status}.`
+}
+
 async function hamta(vag) {
   let svar
 
@@ -24,11 +40,11 @@ async function hamta(vag) {
   } catch {
     // fetch only fails like this when no answer came back at all,
     // which is what happens when the API is not running.
-    throw new Error(`Kunde inte nå API:et på ${API_URL}. Är det startat?`)
+    throw new Error(INTE_NADD)
   }
 
   if (!svar.ok) {
-    throw new Error(`API:et svarade med fel ${svar.status}.`)
+    throw new Error(await lasFel(svar))
   }
 
   return svar.json()
@@ -40,6 +56,24 @@ export function hamtaAllaSpel() {
 
 export function hamtaSpel(id) {
   return hamta(`/api/spel/${id}`)
+}
+
+export async function uppdateraSpel(id, spel) {
+  let svar
+
+  try {
+    svar = await fetch(`${API_URL}/api/spel/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(spel),
+    })
+  } catch {
+    throw new Error(INTE_NADD)
+  }
+
+  if (!svar.ok) {
+    throw new Error(await lasFel(svar))
+  }
 }
 
 // The API stores paths like "/uploads/pubg.svg", so the address has to be put in front.
