@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
-import { hamtaSpel } from '../api'
+import { Image } from 'expo-image'
+import { bildUrl, hamtaSpel } from '../api'
+import StatusBadge from '../components/StatusBadge'
 
 // One line with a label and a value, used a few times below.
 function Rad({ etikett, varde }) {
@@ -31,10 +33,22 @@ export default function DetaljSkarm({ route }) {
 
   return (
     <ScrollView contentContainerStyle={styles.innehall}>
-      <Text style={styles.titel}>{spel.titel}</Text>
+      <View style={styles.omslag}>
+        {bildUrl(spel) ? (
+          <Image source={bildUrl(spel)} style={styles.bild} contentFit="cover" transition={200} />
+        ) : (
+          <View style={styles.ingenBild}>
+            <Text style={styles.ingenBildText}>INGEN BILD</Text>
+          </View>
+        )}
+      </View>
+
+      <View style={styles.rubrikrad}>
+        <Text style={styles.titel}>{spel.titel}</Text>
+        <StatusBadge status={spel.status} />
+      </View>
 
       <Rad etikett="Plattform" varde={spel.plattform} />
-      <Rad etikett="Status" varde={spel.status} />
       {/* Rank can be empty in the database, so show a text instead of nothing. */}
       <Rad etikett="Rank" varde={spel.rank ?? 'Ingen rank'} />
       <Rad etikett="Spelade timmar" varde={`${spel.speladeTimmar} timmar`} />
@@ -54,8 +68,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  titel: {
+  omslag: {
+    aspectRatio: 16 / 9,
     marginBottom: 16,
+    borderRadius: 12,
+    backgroundColor: '#07080d',
+    overflow: 'hidden',
+  },
+  bild: {
+    width: '100%',
+    height: '100%',
+  },
+  ingenBild: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ingenBildText: {
+    color: '#8b94a8',
+    fontSize: 12,
+    letterSpacing: 1,
+  },
+  rubrikrad: {
+    marginBottom: 12,
+    gap: 10,
+  },
+  titel: {
     color: '#e8ecf4',
     fontSize: 24,
     fontWeight: 'bold',
