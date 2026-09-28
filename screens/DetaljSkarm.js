@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { Image } from 'expo-image'
 import { bildUrl, hamtaSpel } from '../api'
+import Felmeddelande from '../components/Felmeddelande'
 import StatusBadge from '../components/StatusBadge'
 
 // One line with a label and a value, used a few times below.
@@ -18,10 +19,23 @@ function Rad({ etikett, varde }) {
 export default function DetaljSkarm({ route }) {
   const { id } = route.params
   const [spel, setSpel] = useState(null)
+  const [fel, setFel] = useState(null)
+
+  function hamta() {
+    setFel(null)
+
+    hamtaSpel(id)
+      .then(setSpel)
+      .catch((error) => setFel(error.message))
+  }
 
   useEffect(() => {
-    hamtaSpel(id).then(setSpel)
+    hamta()
   }, [id])
+
+  if (fel) {
+    return <Felmeddelande meddelande={fel} onForsokIgen={hamta} />
+  }
 
   if (!spel) {
     return (

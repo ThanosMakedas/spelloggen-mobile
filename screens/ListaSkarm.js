@@ -2,27 +2,41 @@ import { useEffect, useState } from 'react'
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
 import { Image } from 'expo-image'
 import { bildUrl, hamtaAllaSpel } from '../api'
+import Felmeddelande from '../components/Felmeddelande'
 import StatusBadge from '../components/StatusBadge'
 
 // navigation is given to every screen in the stack. It is what opens another screen.
 export default function ListaSkarm({ navigation }) {
   const [spel, setSpel] = useState([])
   const [laddar, setLaddar] = useState(true)
+  const [fel, setFel] = useState(null)
+
+  function hamta() {
+    setLaddar(true)
+    setFel(null)
+
+    hamtaAllaSpel()
+      .then(setSpel)
+      .catch((error) => setFel(error.message))
+      .finally(() => setLaddar(false))
+  }
 
   // Runs once, when the screen is shown the first time.
   useEffect(() => {
-    hamtaAllaSpel()
-      .then(setSpel)
-      .finally(() => setLaddar(false))
+    hamta()
   }, [])
 
   if (laddar) {
     return (
       <View style={styles.mitten}>
         <ActivityIndicator size="large" color="#38bdf8" />
-        <Text style={styles.text}>Laddar spel...</Text>
+        <Text style={styles.info}>Laddar spel...</Text>
       </View>
     )
+  }
+
+  if (fel) {
+    return <Felmeddelande meddelande={fel} onForsokIgen={hamta} />
   }
 
   return (
