@@ -15,24 +15,31 @@ if (Platform.OS === 'android' && (dator === 'localhost' || dator === '127.0.0.1'
 
 export const API_URL = `http://${dator}:5080`
 
-export async function hamtaAllaSpel() {
-  const svar = await fetch(`${API_URL}/api/spel`)
+// Both calls below go through this one, so the error messages are the same everywhere.
+async function hamta(vag) {
+  let svar
+
+  try {
+    svar = await fetch(`${API_URL}${vag}`)
+  } catch {
+    // fetch only fails like this when no answer came back at all,
+    // which is what happens when the API is not running.
+    throw new Error(`Kunde inte nå API:et på ${API_URL}. Är det startat?`)
+  }
 
   if (!svar.ok) {
-    throw new Error('API:et svarade med ett fel.')
+    throw new Error(`API:et svarade med fel ${svar.status}.`)
   }
 
   return svar.json()
 }
 
-export async function hamtaSpel(id) {
-  const svar = await fetch(`${API_URL}/api/spel/${id}`)
+export function hamtaAllaSpel() {
+  return hamta('/api/spel')
+}
 
-  if (!svar.ok) {
-    throw new Error('Spelet hittades inte.')
-  }
-
-  return svar.json()
+export function hamtaSpel(id) {
+  return hamta(`/api/spel/${id}`)
 }
 
 // The API stores paths like "/uploads/pubg.svg", so the address has to be put in front.
