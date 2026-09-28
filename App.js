@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { StatusBar } from 'expo-status-bar'
 import DetaljSkarm from './screens/DetaljSkarm'
 import ListaSkarm from './screens/ListaSkarm'
+import RedigeraSkarm from './screens/RedigeraSkarm'
 
 // A stack works like a pile of paper: the list is at the bottom, and other
 // screens are placed on top of it. The back button comes for free.
@@ -25,6 +26,12 @@ export default function App() {
           name="Detaljer"
           component={DetaljSkarm}
           options={({ route }) => ({ title: route.params.titel })}
+        />
+
+        <Stack.Screen
+          name="Redigera"
+          component={RedigeraSkarm}
+          options={({ route }) => ({ title: `Redigera ${route.params.spel.titel}` })}
         />
       </Stack.Navigator>
 

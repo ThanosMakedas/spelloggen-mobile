@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { Image } from 'expo-image'
 import { bildUrl, hamtaSpel } from '../api'
 import Felmeddelande from '../components/Felmeddelande'
@@ -16,7 +16,7 @@ function Rad({ etikett, varde }) {
 }
 
 // route.params holds what the list screen sent when it opened this screen.
-export default function DetaljSkarm({ route }) {
+export default function DetaljSkarm({ route, navigation }) {
   const { id } = route.params
   const [spel, setSpel] = useState(null)
   const [fel, setFel] = useState(null)
@@ -31,7 +31,11 @@ export default function DetaljSkarm({ route }) {
 
   useEffect(() => {
     hamta()
-  }, [id])
+
+    // Load the game again every time this screen comes back into focus,
+    // so a change made in the edit screen is visible at once.
+    return navigation.addListener('focus', hamta)
+  }, [id, navigation])
 
   if (fel) {
     return <Felmeddelande meddelande={fel} onForsokIgen={hamta} />
@@ -69,6 +73,10 @@ export default function DetaljSkarm({ route }) {
       <Rad etikett="Senast spelad" varde={spel.senastSpelad.slice(0, 10)} />
 
       {spel.anteckningar ? <Text style={styles.anteckningar}>{spel.anteckningar}</Text> : null}
+
+      <Pressable style={styles.knapp} onPress={() => navigation.navigate('Redigera', { spel })}>
+        <Text style={styles.knappText}>Redigera</Text>
+      </Pressable>
     </ScrollView>
   )
 }
@@ -76,6 +84,7 @@ export default function DetaljSkarm({ route }) {
 const styles = StyleSheet.create({
   innehall: {
     padding: 16,
+    paddingBottom: 40,
   },
   mitten: {
     flex: 1,
@@ -131,5 +140,19 @@ const styles = StyleSheet.create({
     color: '#8b94a8',
     fontSize: 15,
     lineHeight: 22,
+  },
+  knapp: {
+    alignItems: 'center',
+    marginTop: 24,
+    paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: '#38bdf8',
+    borderRadius: 10,
+    backgroundColor: 'rgba(56, 189, 248, 0.15)',
+  },
+  knappText: {
+    color: '#d9f3ff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 })
